@@ -64,3 +64,16 @@ The file stream is shared between the UI thread (preview) and ExtractWorker via 
 - `spr.py` — SPR sprite sheets (BGRA/indexed frames → PIL images)
 - `act.py` — ACT animation files (frame sequences referencing SPR frames); the preview widget (`ui/preview/act_preview.py`) loads the paired `.spr` via `MainWindow._load_sibling_spr()`
 - `tga.py`, `pal.py` — TGA images and PAL palettes
+- `lub.py` — LUB (compiled Lua) detection and decompilation; `is_binary()` checks for the `\x1bLua` magic header (with null-byte fallback), `decompile()` shells out to `unluac` or `luadec` if available and returns a helpful install message otherwise
+
+### LUB file preview
+
+`.lub` files are handled specially in `MainWindow._on_entry_selected()` (like `.act`):
+- If the data is plain text Lua source → shown directly in the text preview
+- If binary Lua bytecode → `unluac` (or `luadec`) is called via subprocess to decompile it; the result is shown as text
+
+**Install the decompiler** (required for binary `.lub` files):
+```bash
+yay -S unluac   # AUR package; installs unluac.jar + a wrapper shell script
+```
+With `unluac` on PATH, binary `.lub` files decompile automatically on preview. Without it, a comment block explains what to install.

@@ -11,6 +11,9 @@ class TextPreview(QTextEdit):
         font.setFamily("Monospace")
         self.setFont(font)
 
+    def show_text(self, text: str) -> None:
+        self.setPlainText(text)
+
     def show_bytes(self, data: bytes) -> None:
         for enc in ("utf-8", "cp949", "cp1252", "latin-1"):
             try:

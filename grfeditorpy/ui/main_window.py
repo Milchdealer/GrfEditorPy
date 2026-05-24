@@ -232,6 +232,9 @@ class MainWindow(QMainWindow):
                 act_data = entry.get_decompressed_data()
                 spr_data = self._load_sibling_spr(entry)
                 self._preview.show_act_data(act_data, spr_data)
+            elif entry.extension.lower() == ".lub":
+                data = entry.get_decompressed_data()
+                self._preview.show_lub_data(data)
             else:
                 data = entry.get_decompressed_data()
                 self._preview.show_entry_data(data, entry.extension)

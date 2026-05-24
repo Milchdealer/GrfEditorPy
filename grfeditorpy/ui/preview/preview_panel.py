@@ -57,6 +57,19 @@ class PreviewPanel(QStackedWidget):
             self._hex.setPlainText(f"Preview failed: {e}\n\n" + self._hex.toPlainText())
             self.setCurrentIndex(self._idx_hex)
 
+    def show_lub_data(self, data: bytes) -> None:
+        from ...formats.lub import is_binary, decompile
+        try:
+            if is_binary(data):
+                self._text.show_text(decompile(data))
+            else:
+                self._text.show_bytes(data)
+            self.setCurrentIndex(self._idx_text)
+        except Exception as e:
+            self._hex.show_bytes(data)
+            self._hex.setPlainText(f"LUB preview failed: {e}\n\n" + self._hex.toPlainText())
+            self.setCurrentIndex(self._idx_hex)
+
     def show_act_data(self, act_data: bytes, spr_data: Optional[bytes]) -> None:
         try:
             act = parse_act(act_data)
