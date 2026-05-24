@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 
 
 class ExtractDialog(QDialog):
-    def __init__(self, parent: Optional[QWidget] = None, count: int = 1):
+    def __init__(self, parent: Optional[QWidget] = None, count: int = 1, default_dir: str = ""):
         super().__init__(parent)
         self.setWindowTitle("Extract Files")
         self.setMinimumWidth(480)
@@ -18,6 +18,8 @@ class ExtractDialog(QDialog):
         row = QHBoxLayout()
         self._path_edit = QLineEdit()
         self._path_edit.setPlaceholderText("Select destination folder…")
+        if default_dir:
+            self._path_edit.setText(default_dir)
         browse_btn = QPushButton("Browse…")
         browse_btn.clicked.connect(self._browse)
         row.addWidget(self._path_edit, 1)

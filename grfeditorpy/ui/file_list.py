@@ -67,9 +67,10 @@ class FileTableModel(QAbstractTableModel):
 
 
 class FileList(QTableView):
-    entry_selected = Signal(object)       # FileEntry or None
-    extract_requested = Signal(list)      # list[FileEntry]
-    properties_requested = Signal(object) # FileEntry
+    entry_selected = Signal(object)            # FileEntry or None
+    extract_requested = Signal(list)           # list[FileEntry]
+    extract_decompiled_requested = Signal(object)  # FileEntry
+    properties_requested = Signal(object)      # FileEntry
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -125,6 +126,12 @@ class FileList(QTableView):
         act_extract.triggered.connect(lambda: self.extract_requested.emit(entries))
         menu.addAction(act_extract)
         if len(entries) == 1:
+            if entries[0].extension.lower() == ".lub":
+                act_decompile = QAction("Extract as decompiled .lua…", self)
+                act_decompile.triggered.connect(
+                    lambda: self.extract_decompiled_requested.emit(entries[0])
+                )
+                menu.addAction(act_decompile)
             act_props = QAction("Properties…", self)
             act_props.triggered.connect(lambda: self.properties_requested.emit(entries[0]))
             menu.addAction(act_props)

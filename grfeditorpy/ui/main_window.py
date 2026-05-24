@@ -83,6 +83,7 @@ class MainWindow(QMainWindow):
         self._file_list = FileList()
         self._file_list.entry_selected.connect(self._on_entry_selected)
         self._file_list.extract_requested.connect(self._do_extract)
+        self._file_list.extract_decompiled_requested.connect(self._on_extract_decompiled)
         self._file_list.properties_requested.connect(self._show_properties)
         splitter.addWidget(self._file_list)
 
@@ -277,7 +278,8 @@ class MainWindow(QMainWindow):
     def _do_extract(self, entries: list[FileEntry]) -> None:
         if not entries:
             return
-        dlg = ExtractDialog(self, count=len(entries))
+        default = os.path.dirname(self._container.path) if self._container else ""
+        dlg = ExtractDialog(self, count=len(entries), default_dir=default)
         if dlg.exec() != ExtractDialog.DialogCode.Accepted:
             return
         dest = dlg.dest_dir
@@ -301,6 +303,34 @@ class MainWindow(QMainWindow):
     def _on_extract_done(self, count: int) -> None:
         self._progress.hide()
         self._status_label.setText(f"Extracted {count} file(s)")
+
+    def _on_extract_decompiled(self, entry: FileEntry) -> None:
+        from ..formats.lub import is_binary, decompile
+        try:
+            raw = entry.get_decompressed_data()
+        except Exception as e:
+            QMessageBox.critical(self, "Extract", f"Failed to read entry: {e}")
+            return
+
+        if is_binary(raw):
+            source = decompile(raw)
+        else:
+            source = raw.decode("utf-8", errors="replace")
+
+        stem = os.path.splitext(entry.filename)[0]
+        default_name = stem + ".lua"
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save decompiled Lua", default_name,
+            "Lua source (*.lua);;All files (*)"
+        )
+        if not path:
+            return
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(source)
+            self._status_label.setText(f"Saved {os.path.basename(path)}")
+        except Exception as e:
+            QMessageBox.critical(self, "Extract", f"Failed to write file: {e}")
 
     # ------------------------------------------------------------------
     # Properties
