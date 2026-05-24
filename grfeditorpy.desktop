@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=GRF Editor
+GenericName=GRF Archive Editor
+Comment=View and extract files from Ragnarok Online GRF archives
+Exec=/home/jannikf/Code/GRFEditorPy/dist/grfeditorpy/grfeditorpy %f
+Icon=package-x-generic
+Terminal=false
+Categories=Utility;FileManager;
+Keywords=GRF;Ragnarok;Archive;
+StartupWMClass=grfeditorpy
